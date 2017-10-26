@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<robot name="gareth_maxon_transmission" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="width" value="0.1" />
+  <xacro:property name="leglen" value="0.6" />
+  <xacro:property name="polelen" value="0.2" />
+  <xacro:property name="bodylen" value="0.2" />
+  <xacro:property name="baselen" value="0.4" />
+  <xacro:property name="wheeldiam" value="0.07" />
+  <xacro:property name="pi" value="3.1415" />
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <mass value="${mass}" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+    </inertial>
+  </xacro:macro>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder radius="${width}" length="${bodylen}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${width}" length="${bodylen}"/>
+      </geometry>
+    </collision>
+    <xacro:default_inertial mass="10"/>
+  </link>
+
+  <joint name="maxon_motor" type="prismatic">
+    <parent link="base_link"/>
+    <child link="pole"/>
+    
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <link name="pole">
+    <visual>
+      <geometry>
+        <cylinder length="${polelen}" radius="0.01"/>
+      </geometry>
+      <origin xyz="${polelen/2} 0 0" rpy="0 ${pi/2} 0 "/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${polelen}" radius="0.01"/>
+      </geometry>
+      <origin xyz="${polelen/2} 0 0" rpy="0 ${pi/2} 0 "/>
+    </collision>
+    <xacro:default_inertial mass="0.05"/>
+  </link>
+
+
+  <!-- This block connects the head_swivel joint to an actuator (motor), which informs both
+  simulation and visualization of the robot -->
+  <transmission name="maxon_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="$maxon_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="maxon_motor">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+</robot>
+

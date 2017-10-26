@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <name>epos_lib</name>
+  <version>0.0.3</version>
+  <description>A catkin package that provides the EPOS Command Library</description>
+
+  <maintainer email="mwills@wpi.edu">Mitchell Wills</maintainer>
+
+  <license>TODO</license>
+
+  <url type="website">http://www.maxonmotorusa.com/medias/sys_master/root/8815100788766/EPOS-Command-Library-En.pdf</url>
+  <url type="repository">https://github.com/RIVeR-Lab/epos_hardware</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+  </export>
+</package>

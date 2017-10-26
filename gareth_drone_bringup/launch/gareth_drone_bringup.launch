@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+  drone bringup for Salua
+-->
+<launch>
+  
+
+  <!-- dynamixel tilt mech -->
+  <include file="$(find gareth_dynamixel_control)/launch/controller_manager.launch"/>
+  <include file="$(find gareth_dynamixel_control)/launch/start_tilt_controller.launch"/>
+
+  
+</launch>

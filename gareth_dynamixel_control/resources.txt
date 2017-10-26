@@ -1,0 +1,7 @@
+This package was loosely based on this tutorial
+http://wiki.ros.org/dynamixel_controllers/Tutorials
+
+expecially this
+http://wiki.ros.org/dynamixel_controllers/Tutorials/CreatingJointPositionController
+
+

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!--
+ teraranger bringup for Salua
+-->
+<launch>
+
+ <node name="teraranger1" pkg="teraranger" type"one" />
+
+</launch>
+
