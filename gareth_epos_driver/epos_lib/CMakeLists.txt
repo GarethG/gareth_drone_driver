@@ -22,8 +22,13 @@ catkin_package(
 
 include_directories(include)
 
-set(ftd2xx_LIBRARY ${PROJECT_SOURCE_DIR}/lib/armv7hf/libftd2xx.so.1.4.6)
-set(EposCmd_LIBRARY ${PROJECT_SOURCE_DIR}/lib/armv7hf/libEposCmd.so.6.2.1.0)
+if($ENV{USER} STREQUAL "pi")
+  set(ftd2xx_LIBRARY ${PROJECT_SOURCE_DIR}/lib/armv7hf/libftd2xx.so.1.4.6)
+  set(EposCmd_LIBRARY ${PROJECT_SOURCE_DIR}/lib/armv7hf/libEposCmd.so.6.2.1.0)
+else()
+  set(ftd2xx_LIBRARY ${PROJECT_SOURCE_DIR}/lib/x86_64/libftd2xx.so.1.4.6)
+  set(EposCmd_LIBRARY ${PROJECT_SOURCE_DIR}/lib/x86_64/libEposCmd.so.6.2.1.0)
+endif()
 
 add_library(ftd2xx SHARED ${ftd2xx_LIBRARY})
 add_custom_command(TARGET ftd2xx POST_BUILD COMMAND cp ${ftd2xx_LIBRARY} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libftd2xx.so)
