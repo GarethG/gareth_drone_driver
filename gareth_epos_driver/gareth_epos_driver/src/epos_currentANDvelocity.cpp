@@ -71,7 +71,7 @@ public:
   ros::Publisher pos_pub_;        //position publisher
   ros::Subscriber desCurr_sub_;   //desired current subscriber
   ros::Subscriber desVel_sub_;    //desired velocity subscriber
-  ros::Subscriber eposMode_sub_;  //epos mode definition parameter
+  ros::Subscriber eposMode_sub_;  //epos switch mode subscriber
 
   void pub_epos_states();
 
@@ -157,7 +157,7 @@ void EposController::desiredVelocityCallback(const std_msgs::Int32::ConstPtr& ms
 }
 
 
-void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //when starting epos, check subscribed topic "epos/switchMode" and if data == 0 activate current mode; else velocity mode
+void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //when starting epos, check subscribed topic "epos/switchMode" and if data == 0 activate current mode; if data ==1 activate velocity mode
 {
   int lResult = MMC_SUCCESS;
   unsigned int p_rlErrorCode;
@@ -176,7 +176,7 @@ void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //
 		LogError("VCS_ActivateCurrentMode", lResult, p_rlErrorCode);
 		lResult = MMC_FAILED;
 	}
-	LogInfo("i'm here");
+	LogInfo("current mode");
   }
   else if(val == 1)
   {
@@ -186,7 +186,7 @@ void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //
 		LogError("VCS_ActivateProfileVelocityMode", lResult, p_rlErrorCode);
 		lResult = MMC_FAILED;
 	}
-	LogInfo("I'M HERE");
+	LogInfo("velocity mode");
   }
 }
 
