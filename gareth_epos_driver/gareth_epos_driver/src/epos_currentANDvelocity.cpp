@@ -9,6 +9,7 @@
 //============================================================================
 
 #include <iostream>
+#include <string>
 #include "../include/gareth_epos_driver/Definitions.h"
 #include <string.h>
 #include <sstream>
@@ -23,6 +24,7 @@
 #include <stdio.h>
 #include <sys/times.h>
 #include <sys/time.h>
+
 
 //just ros things
 #include <ros/ros.h>
@@ -56,13 +58,14 @@ int   CloseDevice(unsigned int* p_pErrorCode);
 void  SetDefaultParameters();
 int   ParseArguments(int argc, char** argv);
 
-//make a ROS class, basically so that we can easily pass callback data to main()
+//ROS class, so that we can easily pass callback data to main()
 class EposController
 {
 public:
   EposController();
 
   ros::NodeHandle nh_;
+
   ros::Publisher vel_pub_;        //velocity publisher
   ros::Publisher cur_pub_;        //current publisher
   ros::Publisher pos_pub_;        //position publisher
@@ -92,48 +95,48 @@ EposController::EposController()
 
 void EposController::pub_epos_states()
 {
-std_msgs::Int32 vel; //velocity variable
-std_msgs::Int32 cur; //current variable
-std_msgs::Int32 pos; //position variable
+	std_msgs::Int32 vel; //velocity variable
+	std_msgs::Int32 cur; //current variable
+	std_msgs::Int32 pos; //position variable
 
-int lResult = MMC_SUCCESS; 
-unsigned int p_rlErrorCode;
+	int lResult = MMC_SUCCESS; 
+	unsigned int p_rlErrorCode;
 
-int velocity;
-if(VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocity, &p_rlErrorCode) == 0)
+	int velocity;
+	if(VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocity, &p_rlErrorCode) == 0)
 	{
 		LogError("VCS_GetVelocityIs", lResult, p_rlErrorCode);
 		lResult = MMC_FAILED;
 	}
-vel.data = velocity;
-vel_pub_.publish(vel);
+	vel.data = velocity;
+	vel_pub_.publish(vel);
 
-short current;
-if(VCS_GetCurrentIsAveraged(g_pKeyHandle, g_usNodeId, &current, &p_rlErrorCode) == 0)
+	short current;
+	if(VCS_GetCurrentIsAveraged(g_pKeyHandle, g_usNodeId, &current, &p_rlErrorCode) == 0)
 	{
 		LogError("VCS_GetCurrentIsAveraged", lResult, p_rlErrorCode);
 		lResult = MMC_FAILED;
 	}
-cur.data = current;
-cur_pub_.publish(cur);
+	cur.data = current;
+	cur_pub_.publish(cur);
 
-int position;
-if(VCS_GetPositionIs(g_pKeyHandle, g_usNodeId, &position, &p_rlErrorCode) == 0)
+	int position;
+	if(VCS_GetPositionIs(g_pKeyHandle, g_usNodeId, &position, &p_rlErrorCode) == 0)
 	{
 		LogError("VCS_GetPositionIs", lResult, p_rlErrorCode);
 		lResult = MMC_FAILED;
 	}
-pos.data = position;
-pos_pub_.publish(pos);
+	pos.data = position;
+	pos_pub_.publish(pos);
 }
 
 void EposController::desiredCurrentCallback(const std_msgs::Int32::ConstPtr& msg)
 {
-  int lResult = MMC_SUCCESS;
-  unsigned int p_rlErrorCode;
-  short val;
-  val = (short) msg->data;
-  if(VCS_SetCurrentMust(g_pKeyHandle, g_usNodeId, val, &p_rlErrorCode) == 0)
+	int lResult = MMC_SUCCESS;
+	unsigned int p_rlErrorCode;
+	short val;
+	val = (short) msg->data;
+	if(VCS_SetCurrentMust(g_pKeyHandle, g_usNodeId, val, &p_rlErrorCode) == 0)
 	{
 		lResult = MMC_FAILED;
 		LogError("VCS_SetCurrentMust", lResult, p_rlErrorCode);
@@ -142,11 +145,11 @@ void EposController::desiredCurrentCallback(const std_msgs::Int32::ConstPtr& msg
 
 void EposController::desiredVelocityCallback(const std_msgs::Int32::ConstPtr& msg)
 {
-  int lResult = MMC_SUCCESS;
-  unsigned int p_rlErrorCode;
-  long val;
-  val = (long) msg->data;
-  if(VCS_MoveWithVelocity(g_pKeyHandle, g_usNodeId, val, &p_rlErrorCode) == 0)
+	int lResult = MMC_SUCCESS;
+	unsigned int p_rlErrorCode;
+	long val;
+	val = (long) msg->data;
+	if(VCS_MoveWithVelocity(g_pKeyHandle, g_usNodeId, val, &p_rlErrorCode) == 0)
 	{
 		lResult = MMC_FAILED;
 		LogError("VCS_MoveWithVelocity", lResult, p_rlErrorCode);
@@ -160,38 +163,30 @@ void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //
   unsigned int p_rlErrorCode;
   int val;
   val = (int) msg->data;
-  cout << val << endl;
+  cout << "switch mode value is " << val << endl;
+  //cout << "g_usNodeId is " << g_usNodeId << endl;
+  //cout << "g_pKeyHandle is " << g_pKeyHandle << endl;
+  //cout << "p_rlErrorCode is " << p_rlErrorCode << endl;
+
   if(val == 0)
   {
-	
-// trying to implement a halt movement when switching between modes, so that it halts velocity and activates current. it wouldn't work at first power-on, as no mode is in place.
-//  	if(lResult == MMC_SUCCESS)
-//		{
-//			LogInfo("halt velocity movement");
-//
-//			if(VCS_HaltVelocityMovement(p_DeviceHandle, p_usNodeId, &p_rlErrorCode) == 0)
-//			{
-//				lResult = MMC_FAILED;
-//				LogError("VCS_HaltVelocityMovement", lResult, p_rlErrorCode);
-//			}
-//		}
 	cout << val << endl;
 	if(VCS_ActivateCurrentMode(g_pKeyHandle, g_usNodeId, &p_rlErrorCode) == 0)
-		{
-			LogError("VCS_ActivateCurrentMode", lResult, p_rlErrorCode);
-			lResult = MMC_FAILED;
-		}
-  LogInfo("i'm here");
+	{
+		LogError("VCS_ActivateCurrentMode", lResult, p_rlErrorCode);
+		lResult = MMC_FAILED;
+	}
+	LogInfo("i'm here");
   }
   else if(val == 1)
   {
 	cout << val << endl;
 	if(VCS_ActivateProfileVelocityMode(g_pKeyHandle, g_usNodeId, &p_rlErrorCode) == 0)
-		{
-			LogError("VCS_ActivateProfileVelocityMode", lResult, p_rlErrorCode);
-			lResult = MMC_FAILED;
-		}
-  LogInfo("I'M HERE");
+	{
+		LogError("VCS_ActivateProfileVelocityMode", lResult, p_rlErrorCode);
+		lResult = MMC_FAILED;
+	}
+	LogInfo("I'M HERE");
   }
 }
 
@@ -440,13 +435,13 @@ int main(int argc, char** argv)
 
 	if((lResult = OpenDevice(&ulErrorCode))!=MMC_SUCCESS)
 	{
-		LogError("OpenDevice", lResult, ulErrorCode);
+		LogError("OpenDevice Failed", lResult, ulErrorCode);
 		return lResult;
 	}
 
 	if((lResult = PrepareDemo(&ulErrorCode))!=MMC_SUCCESS)
 	{
-		LogError("PrepareDemo", lResult, ulErrorCode);
+		LogError("PrepareDemo Failed", lResult, ulErrorCode);
 		return lResult;
 	}
 	
