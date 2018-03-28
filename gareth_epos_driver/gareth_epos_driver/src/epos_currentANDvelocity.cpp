@@ -163,7 +163,7 @@ void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //
   unsigned int p_rlErrorCode;
   int val;
   val = (int) msg->data;
-  cout << "switch mode value is " << val << endl;
+  //cout << "switch mode value is " << val << endl;
   //cout << "g_usNodeId is " << g_usNodeId << endl;
   //cout << "g_pKeyHandle is " << g_pKeyHandle << endl;
   //cout << "p_rlErrorCode is " << p_rlErrorCode << endl;
@@ -176,7 +176,7 @@ void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //
 		LogError("VCS_ActivateCurrentMode", lResult, p_rlErrorCode);
 		lResult = MMC_FAILED;
 	}
-	LogInfo("current mode");
+	//LogInfo("current mode");
   }
   else if(val == 1)
   {
@@ -186,7 +186,7 @@ void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //
 		LogError("VCS_ActivateProfileVelocityMode", lResult, p_rlErrorCode);
 		lResult = MMC_FAILED;
 	}
-	LogInfo("velocity mode");
+	//LogInfo("velocity mode");
   }
 }
 
