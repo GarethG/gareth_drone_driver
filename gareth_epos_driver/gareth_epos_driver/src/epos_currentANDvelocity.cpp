@@ -4,8 +4,6 @@
 // Version     :
 // Copyright   : maxon motor ag 2014
 // Description : Current Control from Linux library from Maxon
-
-// Note		   :
 //============================================================================
 
 #include <iostream>
@@ -24,11 +22,8 @@
 #include <stdio.h>
 #include <sys/times.h>
 #include <sys/time.h>
-
-
-//just ros things
-#include <ros/ros.h>
-#include <std_msgs/Int32.h>
+#include <ros/ros.h>  //ROS stuff
+#include <std_msgs/Int32.h>  //ROS stuff
 
 typedef void* HANDLE;
 typedef int BOOL;
@@ -72,6 +67,7 @@ public:
   ros::Subscriber desCurr_sub_;   //desired current subscriber
   ros::Subscriber desVel_sub_;    //desired velocity subscriber
   ros::Subscriber eposMode_sub_;  //epos switch mode subscriber
+  ros::Subscriber eposReset_sub_; //epos reset devie subscriber
 
   void pub_epos_states();
 
@@ -79,6 +75,7 @@ private:
   void desiredCurrentCallback(const std_msgs::Int32::ConstPtr& msg);
   void desiredVelocityCallback(const std_msgs::Int32::ConstPtr& msg);
   void switchModeCallback(const std_msgs::Int32::ConstPtr& msg);
+  void resetDeviceCallback(const std_msgs::Int32::ConstPtr& msg);
 };
 
 EposController::EposController()
@@ -90,6 +87,7 @@ EposController::EposController()
   desCurr_sub_ = nh_.subscribe<std_msgs::Int32>("epos/desiredCurrent", 10, &EposController::desiredCurrentCallback, this);
   desVel_sub_ = nh_.subscribe<std_msgs::Int32>("epos/desiredVelocity", 10, &EposController::desiredVelocityCallback, this);
   eposMode_sub_ = nh_.subscribe<std_msgs::Int32>("epos/switchMode", 10, &EposController::switchModeCallback, this);
+  eposReset_sub_ = nh_.subscribe<std_msgs::Int32>("epos/resetDevice", 10, &EposController::resetDeviceCallback, this);
 }
 
 
@@ -157,20 +155,15 @@ void EposController::desiredVelocityCallback(const std_msgs::Int32::ConstPtr& ms
 }
 
 
-void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //when starting epos, check subscribed topic "epos/switchMode" and if data == 0 activate current mode; if data ==1 activate velocity mode
+void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //when starting epos, subscribe to topic "epos/switchMode", if data == 0 activate current mode; if data ==1 activate velocity mode
 {
   int lResult = MMC_SUCCESS;
   unsigned int p_rlErrorCode;
   int val;
   val = (int) msg->data;
-  //cout << "switch mode value is " << val << endl;
-  //cout << "g_usNodeId is " << g_usNodeId << endl;
-  //cout << "g_pKeyHandle is " << g_pKeyHandle << endl;
-  //cout << "p_rlErrorCode is " << p_rlErrorCode << endl;
 
   if(val == 0)
   {
-	cout << val << endl;
 	if(VCS_ActivateCurrentMode(g_pKeyHandle, g_usNodeId, &p_rlErrorCode) == 0)
 	{
 		LogError("VCS_ActivateCurrentMode", lResult, p_rlErrorCode);
@@ -180,7 +173,6 @@ void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //
   }
   else if(val == 1)
   {
-	cout << val << endl;
 	if(VCS_ActivateProfileVelocityMode(g_pKeyHandle, g_usNodeId, &p_rlErrorCode) == 0)
 	{
 		LogError("VCS_ActivateProfileVelocityMode", lResult, p_rlErrorCode);
@@ -189,6 +181,26 @@ void EposController::switchModeCallback(const std_msgs::Int32::ConstPtr& msg) //
 	//LogInfo("velocity mode");
   }
 }
+
+
+void EposController::resetDeviceCallback(const std_msgs::Int32::ConstPtr& msg)
+{
+  int lResult = MMC_SUCCESS;
+  unsigned int p_rlErrorCode;
+  int val;
+  val = (int) msg->data;
+  if(val == 1)
+  {
+	if(VCS_ResetDevice(g_pKeyHandle, g_usNodeId, &p_rlErrorCode) == 0)
+	{
+		LogError("VCS_ResetDevice", lResult, p_rlErrorCode);
+		lResult = MMC_FAILED;
+	}
+	LogInfo("resetting..");
+  }
+}
+
+
 
 
 void PrintUsage()
